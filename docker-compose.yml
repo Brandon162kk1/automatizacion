@@ -7,7 +7,6 @@
     - orchestrator_network
   volumes:
     - ./Codigo:/app/Codigo
-    #- "C:/Users/Brandon/Downloads:/app/Downloads"
     - ${HOST_DOWNLOADS_PATH:-./Downloads}:/app/Downloads
   working_dir: /app/Codigo
   restart: "no"
