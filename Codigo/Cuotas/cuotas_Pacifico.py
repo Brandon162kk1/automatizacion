@@ -786,7 +786,6 @@ def main():
     # --- Eliminar el archivo después de usarlo ---
     try:
         os.remove(codigo_path)
-        #print("🧹 Archivo codigo.txt eliminado del volumen.")
     except FileNotFoundError:
         print("⚠️ No se encontró codigo.txt al intentar eliminarlo (ya fue borrado).")
     except Exception as e:
