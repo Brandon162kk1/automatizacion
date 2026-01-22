@@ -12,8 +12,8 @@ __pycache__/
 *.pyo
 
 # -------- Variables de entorno / secretos --------
-#.env
-#*.env
+.env
+*.env
 config.json
 
 # -------- Logs --------

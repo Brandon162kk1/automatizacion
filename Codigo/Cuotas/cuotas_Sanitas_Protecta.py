@@ -27,11 +27,9 @@ from GoogleChrome.fecha_y_hora import get_timestamp,get_fecha_hoy
 #--------- COMPAÑÍA SANITAS ---------------
 ruc_sanitas = '20523470761'
 #--------- COMPAÑÍA SANITAS PROTECTA ------
-#login_url_sanitas_protecta = 'https://protectasecurity.sanitasperu.com/'
 login_url_sanitas_protecta = os.getenv("login_url_sanitas_protecta")
 ruc_sanitas_protecta = '20517207331'
 #--------- COMPAÑÍA SANITAS CRECER --------
-#login_url_sanitas_crecer = 'https://crecerseguros.sanitasperu.com/'
 login_url_sanitas_crecer = os.getenv("login_url_sanitas_crecer")
 ruc_sanitas_crecer = '20600098633'
 # Lista de IDs de compañía
