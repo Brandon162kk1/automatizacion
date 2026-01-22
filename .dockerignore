@@ -1,0 +1,28 @@
+# IDEs
+.vscode/
+.idea/
+.vs/
+*.vsidx
+*.suo
+*.user
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Variables de entorno / secretos
+.env
+*.env
+config.json
+
+# Logs
+*.log
+
+# Archivos de datos que no necesitas en la imagen
+*.xlsx
+*.pdf
+
+# Archivos generados temporales
+Downloads/
+*.pid

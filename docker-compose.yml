@@ -1,0 +1,137 @@
+﻿x-rpa-base: &rpa-base
+  image: automatizacion
+  build: .
+  env_file:
+    - ${HOST_CREDENCIALES_PATH}
+  networks:
+    - orchestrator_network
+  volumes:
+    - ./Codigo:/app/Codigo
+    #- "C:/Users/Brandon/Downloads:/app/Downloads"
+    - ${HOST_DOWNLOADS_PATH:-./Downloads}:/app/Downloads
+  working_dir: /app/Codigo
+  restart: "no"
+
+services:
+    
+  rpa_positiva:
+    profiles: ["positiva"]
+    <<: *rpa-base
+    container_name: cuotasPositiva
+    ports:
+      - "6080:6080"
+    environment:
+      - NOVNC_PORT=6080
+      - DISPLAY_NUM=0
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_positiva.conf
+
+  rpa_sanitas:
+    profiles: ["sanitas"]
+    <<: *rpa-base
+    container_name: cuotasSanitas
+    ports:
+      - "6081:6081"
+    environment:
+      - NOVNC_PORT=6081
+      - DISPLAY_NUM=1
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_sanitas.conf
+
+  rpa_mapfre:
+    profiles: ["mapfre"]
+    <<: *rpa-base
+    container_name: cuotasMapfre
+    ports:
+      - "6082:6082"
+    environment:
+      - NOVNC_PORT=6082
+      - DISPLAY_NUM=2
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_mapfre.conf
+
+  rpa_pacifico:
+    profiles: ["pacifico"]
+    <<: *rpa-base
+    container_name: cuotasPacifico
+    ports:
+      - "6083:6083"
+    volumes:
+      - ./Codigo:/app/Codigo
+      - "C:/Users/Brandon/Downloads:/app/Downloads"
+      - pacifico_codigo:/codigo
+    environment:
+      - NOVNC_PORT=6083
+      - DISPLAY_NUM=3
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_pacifico.conf
+
+  rpa_qualitas:
+    profiles: ["qualitas"]
+    <<: *rpa-base
+    container_name: cuotasQualitas
+    ports:
+      - "6084:6084"
+    environment:
+      - NOVNC_PORT=6084
+      - DISPLAY_NUM=4
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_qualitas.conf
+
+  rpa_rimac:
+    profiles: ["rimac"]
+    <<: *rpa-base
+    container_name: cuotasRimac
+    ports:
+      - "6085:6085"
+    environment:
+      - NOVNC_PORT=6085
+      - DISPLAY_NUM=5
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_rimac.conf
+
+  rpa_crecer:
+    profiles: ["crecer"]
+    <<: *rpa-base
+    container_name: cuotasCrecer
+    ports:
+      - "6086:6086"
+    environment:
+      - NOVNC_PORT=6086
+      - DISPLAY_NUM=6
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_crecer.conf
+
+  rpa_protecta:
+    profiles: ["protecta"]
+    <<: *rpa-base
+    container_name: cuotasProtecta
+    ports:
+      - "6087:6087"
+    environment:
+      - NOVNC_PORT=6087
+      - DISPLAY_NUM=7
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_cuotas_protecta.conf
+
+  rpa_facturas:
+    profiles: ["factura"]
+    <<: *rpa-base
+    container_name: enviarFacturas
+    ports:
+      - "6088:6088"
+    environment:
+      - NOVNC_PORT=6088
+      - DISPLAY_NUM=8
+    command: supervisord -c /app/Codigo/Supervisord/supervisord_facturas.conf
+
+volumes:
+  pacifico_codigo:
+    external: true
+  rimac_Web:
+    external: true
+
+networks:
+  orchestrator_network:
+    name: orchestrator_network
+    external: true
+
+# El Codigo ya esta como volumen,asi que ante un cambio ya no se debe construir la imagen y ejecutar contenedor nuevamente
+# sino solo hay que reiniciar el contenedor para que tome los cambios en el codigo.
+
+# docker-compose down  -> para detener y eliminar los contenedores
+# docker-compose up -d -> para iniciar todos los servicios del contenedores en segundo plano
+
+# docker compose --profile sanitas up -d -> Levantar solo el servicio a traves de un filtro

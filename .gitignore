@@ -1,0 +1,31 @@
+# -------- IDEs --------
+.vscode/
+.idea/
+.vs/
+*.vsidx
+*.suo
+*.user
+
+# -------- Python --------
+__pycache__/
+*.pyc
+*.pyo
+
+# -------- Variables de entorno / secretos --------
+.env
+*.env
+config.json
+
+# -------- Logs --------
+*.log
+
+# -------- Archivos de datos --------
+*.xlsx
+*.pdf
+
+# -------- Archivos generados --------
+Downloads/
+
+# -------- Docker --------
+pacifico_codigo/
+*.pid
