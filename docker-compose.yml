@@ -138,7 +138,10 @@ networks:
 #----------------------
 # DEV:
 # rama dev hace cambios y sube al main
-#     add → commit → push
+#     add → commit → push 
+# git add .
+# git commit -m "Mensaje"
+# git push origin rama
 
 # MAIN:
 #   main trae cambios de dev , lo une y sube
