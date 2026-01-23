@@ -322,6 +322,8 @@ def main():
    
     print("🧩 Resuelve el CAPTCHA manualmente y clic en 'Ingresar'.")
 
+    desbloquear_interaccion()
+
     #------Carpetas de Descargas y Volumen del Docker----------
     carpeta_descargas = "Downloads"
     # --- Construir ruta de Downloads por defecto ---

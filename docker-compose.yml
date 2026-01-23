@@ -134,3 +134,12 @@ networks:
 # docker-compose up -d -> para iniciar todos los servicios del contenedores en segundo plano
 
 # docker compose --profile sanitas up -d -> Levantar solo el servicio a traves de un filtro
+
+#----------------------
+# DEV:
+# rama dev hace cambios y sube al main
+#     add → commit → push
+
+# MAIN:
+#   main trae cambios de dev , lo une y sube
+#   pull → merge dev → push
