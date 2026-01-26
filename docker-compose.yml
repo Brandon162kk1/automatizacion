@@ -146,3 +146,6 @@ networks:
 # MAIN:
 #   main trae cambios de dev , lo une y sube
 #   pull → merge dev → push
+# git pull origin dev
+# git merge origin/dev
+# git push origin 

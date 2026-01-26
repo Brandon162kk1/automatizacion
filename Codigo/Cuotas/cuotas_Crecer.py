@@ -29,7 +29,7 @@ username_crecer = os.getenv("username_crecer")
 password_crecer = os.getenv("password_crecer")
 para_venv = os.getenv("para")
 para_lista = para_venv.split(",") if para_venv else []
-copia_venv = os.getenv("copia")
+copia_venv = os.getenv("copia_cuotas")
 copias_lista = copia_venv.split(",") if copia_venv else []
 #----- Carpeta de la Compañia -------
 nombre_carpeta_compañia = f"Crecer_VidaLey_{get_timestamp()}"
