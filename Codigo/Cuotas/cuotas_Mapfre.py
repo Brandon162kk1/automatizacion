@@ -113,7 +113,7 @@ def procesar_fila(driver,wait,row,ruta_carpeta_facturas, ruta_carpeta_comprobant
         #time.sleep(2)
         print("🖱️ Clic en el # de Póliza")
 
-        poliza_input = wait.until(EC.presence_of_element_located((By.ID, "mat-input-4")))
+        poliza_input = wait.until(EC.presence_of_element_located((By.ID, "mat-input-5")))
         poliza_input.clear()
         poliza_input.send_keys(numero_poliza_birlik)
         print(f"⌨️ Digitando la póliza '{numero_poliza_birlik}'.")
@@ -349,94 +349,49 @@ def main():
     elemento.click()
     print("🖱️ Clic en enviar por Correo Electronico.")
 
-    reintentos = 0
-    while True:
+    codigo_mapfre_path = "/codigo_mapfre/codigo.txt"
 
-        # ----- Obtener el código desde API -----
-        codigo = None
-        while not codigo:
-            try:
-                response = requests.get(f"http://{nom_serv}:5000/obtener-codigo?id={nombre}", timeout=5)
+    while not os.path.exists(codigo_mapfre_path):
+        time.sleep(2)
 
-                if response.status_code == 200:
-                    data = response.json()
-                    codigo = data.get("codigo")
-                    if codigo:
-                        print(f"✅ Código recibido: {codigo}")
-                        break
-                else:
-                    print(f"⚠️ Error HTTP {response.status_code}")
+    with open(codigo_mapfre_path, "r") as f:
+        codigo = f.read().strip()
 
-            except Exception as e:
-                print(f"⚠️ Error consultando API: {e}")
+    print(f"✅ Código recibido desde volumen: {codigo}")
 
-            time.sleep(1)
+    inputs = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "input.g-input-codes__code")))
 
-        # ----- Ingresar el código -----
-        inputs = wait.until(EC.presence_of_all_elements_located(
-            (By.CSS_SELECTOR, "input.g-input-codes__code")
-        ))
+    if len(inputs) == len(codigo):
+        for i, inp in enumerate(inputs):
+            inp.clear()
+            inp.send_keys(codigo[i])
+    else:
+        raise Exception("Los inputs no coinciden con la longitud del código")
 
-        if len(inputs) == len(codigo):
-            for i, inp in enumerate(inputs):
-                inp.clear()
-                inp.send_keys(codigo[i])
-        else:
-            print("⚠️ Los inputs no coinciden con la longitud del código.")
-            continue
+    time.sleep(1)
 
-        time.sleep(1)
+    try:
+        comprobar_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Comprobar')]")))
+        comprobar_btn.click()
+        print("🖱️ Clic en 'Comprobar'")
+    except Exception as e:
+        raise Exception(f"No se pudo hacer clic en Comprobar -> {e}")
 
-        # ----- Clic en 'Comprobar' -----
-        try:
-            comprobar_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Comprobar')]")))
-            comprobar_btn.click()
-            print("🖱️ Clic en 'Comprobar'")
-        except Exception as e:
-            print(f"❌ No se pudo hacer clic en Comprobar: {e}")
-            continue
+    # --- Eliminar el archivo después de usarlo ---
+    try:
+        os.remove(codigo_mapfre_path)
+        print("🧹 Archivo codigo.txt eliminado desde volumen")
+    except FileNotFoundError:
+        print("⚠️ No se encontró codigo.txt al intentar eliminarlo (ya fue borrado)")
+    except Exception as e:
+        print(f"❌ Error al eliminar codigo.txt: {e}")
 
-        try:
-            # Detectar si aparece el mensaje de código incorrecto
-            btn_aceptar = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.XPATH,"//button[contains(@class,'swal2-confirm') and normalize-space()='Aceptar']")))
-            btn_aceptar.click()
-            print("⚠️ Código incorrecto → clic en 'Aceptar'")
-
-            # Si ya se hizo un reintento → NO volver a enviar código → terminar flujo
-            if reintentos >= 1:
-                print("❌ Ya se hizo 1 reintento → NO se reenviará otro código. Abortando.")
-                break  # o return, según tu flujo
-     
-            # Incrementamos reintentos
-            reintentos += 1
-
-            # Solo reenviar una vez
-            try:
-                volver_enviar = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(),'Volver a enviar')]")))
-                volver_enviar.click()
-                print("🔄 Solicitud reenviada (solo una vez)")
-            except TimeoutException:
-                print("⚠️ No apareció 'Volver a enviar', continuando...")
-
-            # Esperar antes de pedir un nuevo código
-            print("⏳ Esperando 20 segundos antes de pedir un nuevo código...")
-            time.sleep(20)
-
-            continue   # volver al inicio del while
-
-        except TimeoutException:
-            pass
-
-        # ----- Detectar si el código fue correcto -----
-        try:
-            boton_ok = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[contains(text(), 'Ok')]]")))
-            boton_ok.click()
-            print("🖱️ Clic en 'Ok'.")
-            break  # salir del ciclo total
-
-        except TimeoutException:
-            print("⏳ Código enviado, pero aún no aparece OK... reintentando.\n")
-            continue
+    try:
+        boton_ok = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[contains(text(), 'Ok')]]")))
+        boton_ok.click()
+        print("🖱️ Clic en 'Ok'") 
+    except TimeoutException:
+        pass
 
     consulta_gestion = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='CONSULTAS DE GESTION']")))
     consulta_gestion.click()

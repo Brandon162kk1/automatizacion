@@ -41,6 +41,10 @@ services:
     container_name: cuotasMapfre
     ports:
       - "6082:6082"
+    volumes:
+      - mapfre_codigo:/codigo_mapfre
+      - "C:/Users/Brandon/Downloads:/app/Downloads"
+      - ./Codigo:/app/Codigo
     environment:
       - NOVNC_PORT=6082
       - DISPLAY_NUM=2
@@ -117,6 +121,9 @@ services:
     command: supervisord -c /app/Codigo/Supervisord/supervisord_facturas.conf
 
 volumes:
+  mapfre_codigo:
+    name: mapfre_codigo
+    external: true
   pacifico_codigo:
     external: true
   rimac_Web:
