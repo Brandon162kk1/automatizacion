@@ -1,4 +1,6 @@
 ﻿#-- Froms --
+from dataclasses import asdict
+import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -437,123 +439,125 @@ def main():
     driver, wait = abrirDriver()
 
     driver.get(url_Positiva)
-    print("✅ Ingresando a la URL")
-    login_exitoso = False
+    print("⌛ Ingresando a la URL")
 
-    for intento in range(2):
-        print(f"🔄 Intento de login número {intento + 1}...")
+    try:
+
+        time.sleep(3)
+        user_field = wait.until(EC.presence_of_element_located((By.ID, "b5-Input_User")))
+        user_field.clear()
+
+        mover_y_hacer_click_simple(driver, user_field)
+        time.sleep(random.uniform(0.97, 0.99))
+
+        escribir_lento(user_field, username, min_delay=0.97, max_delay=0.99)
+        print("⌨️ Digitando el Username")
+
+        time.sleep(1 + random.random() * 1.5)
+
+        password_field = wait.until(EC.presence_of_element_located((By.ID, "b5-Input_PassWord")))
+        password_field.clear()
+
+        mover_y_hacer_click_simple(driver, password_field)
+        time.sleep(random.uniform(0.97, 0.99))
+
+        escribir_lento(password_field, password, min_delay=0.97, max_delay=0.99)
+        print(f"⌨️ Digitando el Password '{password}'.")
+
+        time.sleep(5)
+
+        login_button = wait.until(EC.element_to_be_clickable((By.ID, "b5-btnAction")))
+        mover_y_hacer_click_simple(driver, login_button)
+        print("🖱️ Clic en Inicar Sesión")
 
         try:
 
-            time.sleep(3)
-            user_field = wait.until(EC.presence_of_element_located((By.ID, "b5-Input_User")))
-            user_field.clear()
+            popup_text = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(text(),'Usuario o contraseña incorrectos')]")))           
+            if popup_text:
+                print("❌ Usuario o contraseña incorrectos")
+                aceptar_btn = wait.until(EC.presence_of_element_located((By.XPATH, "//button[.//span[text()='Aceptar']]")))
+                aceptar_btn.click()
+                print("🖱️ Clic en Aceptar")
 
-            mover_y_hacer_click_simple(driver, user_field)
-            time.sleep(random.uniform(0.97, 0.99))
+                print("⌛ Esperando 30 minutos para poder ingresar de nuevo.")
+                time.sleep(1800)
+                sys.exit()
+        except:
+            pass
 
-            escribir_lento(user_field, username, min_delay=0.97, max_delay=0.99)
-            print("✅ Digitando el Username")
+        wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class,'menu-item')]//span[normalize-space()='Autogestión']/parent::div")))
+        autogestion = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'menu-item')]//span[normalize-space()='Autogestión']/parent::div")))
 
-            time.sleep(1 + random.random() * 1.5)
+        driver.execute_script("arguments[0].click();", autogestion)
+        print("✅ Login exitoso")
 
-            password_field = wait.until(EC.presence_of_element_located((By.ID, "b5-Input_PassWord")))
-            password_field.clear()
-
-            mover_y_hacer_click_simple(driver, password_field)
-            time.sleep(random.uniform(0.97, 0.99))
-
-            escribir_lento(password_field, password, min_delay=0.97, max_delay=0.99)
-            print(f"✅ Digitando el Password '{password}'.")
-
-            time.sleep(1 + random.random() * 1.5)
-
-            login_button = wait.until(EC.element_to_be_clickable((By.ID, "b5-btnAction")))
-            mover_y_hacer_click_simple(driver, login_button)
-            print("🖱️ Clic en Inicar Sesión")
-
-            #time.sleep(5)
-
-            try:
-                popup_text = WebDriverWait(driver,7).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(text(),'Usuario o contraseña incorrectos')]")))
-                if popup_text:
-                    print("❌ Usuario o contraseña incorrectos")
-                    aceptar_btn = wait.until(EC.presence_of_element_located((By.XPATH, "//button[.//span[text()='Aceptar']]")))
-                    aceptar_btn.click()
-                    time.sleep(2)
-
-                    driver.refresh()
-                    time.sleep(2)
-                    continue
-
-            except:
-                pass
-
-            login_exitoso = True
-            break
-
-        except Exception as e:
-            print(f"❌ Error durante el intento {intento+1}: {e}")
-            driver.refresh()
-            time.sleep(2)
-
-    time.sleep(3)
-
-    if not login_exitoso:
-        print("❌ No se pudo iniciar sesión después de 2 intentos.")
-        print("⌛ Esperando 30 minutos para poder ingresar de nuevo.")
-        #release_lock()
-        time.sleep(1800)
+    except Exception as e:
+        print(f"❌ No se pudo iniciar sesión: {e}")
+        time.sleep(10)
         sys.exit()
-
-    wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class,'menu-item')]//span[normalize-space()='Autogestión']/parent::div")))
-    autogestion = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'menu-item')]//span[normalize-space()='Autogestión']/parent::div")))
-
-    driver.execute_script("arguments[0].click();", autogestion)
-    print("✅ Login exitoso")
-    print("🖱️ Clic en Autogestión")
-
-    ov = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='OV']")))
-    ov.click()
-    print("🖱️ Clic en 'OV' ")
-
-    wait.until(lambda d: len(d.window_handles) > 1)
-
-    driver.switch_to.window(driver.window_handles[-1])
 
     try:
-        alert = WebDriverWait(driver,5).until(EC.alert_is_present())
-        print(f"⚠️ Alerta presente: {alert.text}")
-        alert.accept()
-        print("✅ Alerta aceptada")
-    except:
-        print("✅ No apareció ninguna alerta")
-                
-    resultado,asunto = validar_pagina(driver)    
+        # Despues de Login
+        wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class,'menu-item')]//span[normalize-space()='Autogestión']/parent::div")))
+        autogestion = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'menu-item')]//span[normalize-space()='Autogestión']/parent::div")))
 
-    if not resultado:
+        driver.execute_script("arguments[0].click();", autogestion)
+        print("✅ Login exitoso")
+        print("🖱️ Clic en Autogestión")
 
-        print(asunto)
-        print("⌛ Esperando 30 minutos para poder ingresar de nuevo.")
-        #release_lock()
-        time.sleep(1800) #---> Espera 30 min de forma manual
+    except Exception as e:
+        print(f"❌ No se pudo dar clic en Autogestión, Motivo -> {e}")
+        time.sleep(10)
         sys.exit()
 
-    estados_de_cuenta_img = wait.until(EC.presence_of_element_located((By.ID, f"stUIUserOV31_img")))
-    print("🖱️ Mouse sobre la imagen 'Estado de Cuenta'.")
+    try:
+        # Despues de Autogestion
+        ov = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='OV']")))
+        ov.click()
+        print("🖱️ Clic en 'OV' ")
 
-    action = ActionChains(driver)
-    action.move_to_element(estados_de_cuenta_img).perform()
+        wait.until(lambda d: len(d.window_handles) > 1)
 
-    span_element = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(@class, 'stsp') and contains(text(), 'Estado') and contains(text(), 'cuenta')]")))
+        driver.switch_to.window(driver.window_handles[-1])
 
-    id_dinamico = span_element.get_attribute("id")
+        try:
+            alert = WebDriverWait(driver,5).until(EC.alert_is_present())
+            print(f"⚠️ Alerta presente: {alert.text}")
+            alert.accept()
+            print("✅ Alerta aceptada")
+        except:
+            print("✅ No apareció ninguna alerta")
+                
+        resultado,asunto = validar_pagina(driver)    
 
-    estado_de_cuenta_link = wait.until(EC.element_to_be_clickable((By.ID, id_dinamico)))
-    estado_de_cuenta_link.click()
-    print("🖱️ Clic en 'Estado de Cuenta'.")
+        if not resultado:
+            raise Exception(asunto)
+            # print("⌛ Esperando 30 minutos para poder ingresar de nuevo.")
+            # #release_lock()
+            # time.sleep(1800) #---> Espera 30 min de forma manual
+            # sys.exit()
 
-    time.sleep(3)
+        estados_de_cuenta_img = wait.until(EC.presence_of_element_located((By.ID, f"stUIUserOV31_img")))
+        print("🖱️ Mouse sobre la imagen 'Estado de Cuenta'.")
+
+        action = ActionChains(driver)
+        action.move_to_element(estados_de_cuenta_img).perform()
+
+        span_element = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(@class, 'stsp') and contains(text(), 'Estado') and contains(text(), 'cuenta')]")))
+
+        id_dinamico = span_element.get_attribute("id")
+
+        estado_de_cuenta_link = wait.until(EC.element_to_be_clickable((By.ID, id_dinamico)))
+        estado_de_cuenta_link.click()
+        print("🖱️ Clic en 'Estado de Cuenta'.")
+
+        time.sleep(3)
+
+    except Exception as e:
+        print(f"⚠️ Motivo: {e}")
+        print("⌛ Esperando 30 minutos para poder ingresar de nuevo.")
+        time.sleep(1800)
+        sys.exit()
 
     while True:
 

@@ -389,7 +389,7 @@ def main():
     try:
         boton_ok = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[.//span[contains(text(), 'Ok')]]")))
         boton_ok.click()
-        print("🖱️ Clic en 'Ok'") 
+        print("🖱️ Clic en 'Ok'")
     except TimeoutException:
         pass
 
